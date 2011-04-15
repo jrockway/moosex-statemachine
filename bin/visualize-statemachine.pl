@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
 
+# PODNAME: visualize-statemachine.pl
+# ABSTRACT: script to invoke L<MooseX::StateMachine::App::GraphViz>
+
 use strict;
 use warnings;
 use feature ':5.10';
