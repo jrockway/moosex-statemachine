@@ -73,7 +73,7 @@ sub run {
         return 0;
     }
 
-    write_file($self->output_file, $dot);
+    write_file($self->output_file->stringify, $dot);
     return 0;
 }
 
