@@ -48,9 +48,16 @@ lives_ok {
         transitions => {
             logout => sub { $_[0]->log("client logged out"); $_[0]->clear_username },
         },
+        on_leave => sub {
+            $_[0]->log("deleting session data");
+        },
     );
 
-    state 'logout' => ();
+    state 'logout' => (
+        on_enter => sub {
+            $_[0]->log("removing user from user list");
+        },
+    );
 }q 'created state machine ok';
 
 my $machine = Connection->new;
@@ -80,5 +87,8 @@ ok $machine->is_logout, 'is_logout';
 dies_ok {
     $machine->delete_crap;
 } 'can no longer delete crap (or anything)';
+
+is $machine->logger->[-2], 'deleting session data', 'on_leave ran';
+is $machine->logger->[-1], 'removing user from user list', 'on_enter ran';
 
 done_testing;

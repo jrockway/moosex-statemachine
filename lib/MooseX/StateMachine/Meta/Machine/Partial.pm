@@ -105,6 +105,8 @@ sub build_class_for {
     # set some attributes in the metaclass
     $meta->state_name($state);
     $meta->base(my $base = $self->base);
+    $meta->on_enter($def->{on_enter}) if exists $def->{on_enter};
+    $meta->on_leave($def->{on_leave}) if exists $def->{on_leave};
 
     # add the is_* for all states
     $meta->add_method( "is_$state" => sub { 1 } );
@@ -125,12 +127,18 @@ sub build_class_for {
 
         $meta->add_method( $t => sub {
             my $self = shift;
+            # run stuff in the current ("old") state
             $code->($self, @_);
-            $base->rebless_instance_back($self);
+            $self->meta->run_on_leave($self, @_);
 
+            # rebless back to superclass, then back to new state subclass
+            $self->meta->base->rebless_instance_back($self);
             my $new_class = $self->meta->class_for_state($t);
             $new_class->rebless_instance($self);
-            return; # XXX: should this return $code->()'s return ?
+
+            # now run stuff in the new state
+            $self->meta->run_on_enter($self, @_);
+            return;
         });
     }
 
