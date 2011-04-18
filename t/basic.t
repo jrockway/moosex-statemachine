@@ -58,7 +58,7 @@ lives_ok {
             $_[0]->log("removing user from user list");
         },
     );
-}q 'created state machine ok';
+} 'created state machine ok';
 
 my $machine = Connection->new;
 isa_ok $machine, 'Connection';
